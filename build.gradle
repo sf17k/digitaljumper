@@ -1,0 +1,90 @@
+// build.gradle (repo root)
+
+// This file configures gradle with settings common to all projects,
+// as well as some project-specific settings.
+// Each subproject also has its own build.gradle file.
+
+// See readme-gradle.txt for details.
+
+
+// this section is for gradle itself
+buildscript {
+    repositories {
+        // where to download gradle from
+        mavenLocal()
+        mavenCentral()
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        // proguard directory
+        flatDir dirs: 'gradle/proguard'
+    }
+    dependencies {
+        // this is "group:name:version" syntax without group or version
+        classpath ':proguard:'
+    }
+}
+
+
+// config for all projects (root + subprojects)
+
+allprojects {
+    // support for various IDEs
+    apply plugin: "eclipse"
+    apply plugin: "idea"
+
+    // version of project
+    // leave commented out for "unspecified"
+    //version = '1.0'
+
+    ext {
+        appName = "digital-jumper"
+        gdxVersion = '1.9.3'
+        roboVMVersion = '2.1.0'
+        box2DLightsVersion = '1.4'
+        ashleyVersion = '1.7.0'
+        aiVersion = '1.8.0'
+    }
+
+    // repos to download dependencies from
+    // including libgdx and its extensions
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        maven { url "https://oss.sonatype.org/content/repositories/releases/" }
+    }
+}
+
+
+// project-specific configs
+// see also build.gradle files in project dirs
+
+project(":client") {
+    apply plugin: "java"
+
+    dependencies {
+        // originally from :core
+        compile "com.badlogicgames.gdx:gdx:$gdxVersion"
+        compile "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
+        compile "com.badlogicgames.box2dlights:box2dlights:$box2DLightsVersion"
+        compile "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
+        compile "com.badlogicgames.gdx:gdx-controllers:$gdxVersion"
+
+        // originally from :desktop
+        compile "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
+        compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+        compile "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
+        compile "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
+        compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
+        compile "com.badlogicgames.gdx:gdx-controllers-desktop:$gdxVersion"
+        compile "com.badlogicgames.gdx:gdx-controllers-platform:$gdxVersion:natives-desktop"
+    }
+}
+
+
+// IDE-specific
+tasks.eclipse.doLast {
+    delete ".project"
+    // possibly bad to delete, could contain unrelated settings
+    //delete ".settings/"
+}
+

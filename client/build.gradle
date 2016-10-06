@@ -1,0 +1,195 @@
+// client/build.gradle
+
+// For more settings that apply to this project, see the
+// build.gradle in repo root.
+
+// See readme-gradle.txt for details.
+
+
+// 'java' plugin -------------------------------------------
+
+// https://docs.gradle.org/current/userguide/tutorial_java_projects.html
+// https://docs.gradle.org/current/userguide/java_plugin.html
+
+// technically don't need this line cuz it's in root build.gradle
+//apply plugin: "java"
+
+// passed to javac -source flag
+// the -target flag also uses this value unless set with targetCompatibility
+// see also: 'target' property of 'proguardJar' task below
+sourceCompatibility = 1.7
+
+// configure the 'main' source set
+// (not using any additional source sets)
+sourceSets.main.java.srcDirs = [ "src/" ]
+
+// set source code text encoding
+// libgdx setup added this
+// guessing it's identical to:
+//     compileJava.options.encoding = 'UTF-8'
+//     compileTestJava.options.encoding = 'UTF-8'
+// compileJava and compileTestJava are tasks
+// options is of type CompileOptions
+// https://docs.gradle.org/current/dsl/org.gradle.api.tasks.compile.CompileOptions.html
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+// minimize confusion, use this instead of "libs"
+jar.destinationDir = file("$buildDir/libs-unprocessed")
+
+
+// proguard ------------------------------------------------
+
+// ProGuardTask comes from the proguard.jar included in repo
+
+task proguardJar(type: proguard.gradle.ProGuardTask) {
+    description "Shrinks, optimizes, and obfuscates jars with ProGuard."
+
+    // client.jar
+    injars jar
+
+    // find rt.jar
+    // expects JAVA_HOME to be set
+    libraryjars "$System.env.JAVA_HOME/jre/lib/rt.jar"
+
+    // library jars
+    libraryjars configurations.runtime
+
+    // output the processed client.jar here
+    // keeping the original name in case it has a version number
+    outjars "$buildDir/libs-processed/" + jar.outputs.getFiles().getSingleFile().getName()
+
+    // should probably match sourceCompatibility
+    target "1.7"
+
+    // get rest of config from file
+    configuration "../proguard.cfg"
+}
+
+
+// 'application' plugin ------------------------------------
+
+// includes 'distribution' plugin
+// adds 'run' task and various dist tasks
+// https://docs.gradle.org/current/userguide/application_plugin.html
+// https://docs.gradle.org/current/userguide/distribution_plugin.html
+
+apply plugin: "application"
+
+applicationName = "digitaljumper"
+mainClassName = "com.drakelinglabs.digitaljumper.client.Main"
+
+// "ext" is used to set arbitrary extra properties
+// that can then be accessed directly if desired (i.e. without "ext.")
+// here, ext.foo is the same as project.ext.foo
+// which can be accessed afterward with foo or project.foo
+
+// NetBeans expects "mainClass" to be set
+// in order to run its built-in debug task
+ext.mainClass = mainClassName
+
+// configure run task
+run {
+    // the task itself shouldn't fail when the program crashes
+    ignoreExitValue = true
+    // defaults to none
+    //standardInput = System.in
+    //workingDir = file("..")
+}
+
+// custom templates for the start scripts that go in bin/
+// NOTE: be sure to run 'clean' task after modifying the template files
+// NOTE: consider updating these periodically from the gradle github,
+// taking care to reapply any customizations we've made:
+// https://github.com/gradle/gradle/tree/master/subprojects/plugins/src/main/resources/org/gradle/api/internal/plugins
+
+startScripts {
+    unixStartScriptGenerator.template = resources.text.fromFile('unixStartScript.txt')
+    windowsStartScriptGenerator.template = resources.text.fromFile('windowsStartScript.txt')
+}
+
+// put .zip and .tar files in reporoot/distributions/
+distsDirName = "../../distributions"
+
+// specify what files to put into the distribution
+// 'contents' is a CopySpec
+// we are calling .from() on it to add on to what's already there
+// https://docs.gradle.org/current/dsl/org.gradle.api.tasks.Copy.html
+// https://docs.gradle.org/current/javadoc/org/gradle/api/file/CopySpec.html
+// asterisks (**) explained here
+// http://stackoverflow.com/a/86915
+
+distributions {
+    normal {
+        baseName = main.baseName
+        contents {
+            from ("..") {
+                include "data/**"
+            }
+            from (proguardJar) { // obfuscated
+                into "lib"
+                include "**"
+            }
+            from (configurations.runtime) {
+                into "lib"
+                include "**"
+            }
+            from (startScripts) {
+                into "bin"
+                include "**"
+            }
+        }
+    }
+    unobfuscated {
+        baseName = main.baseName + "-UNOBFUSCATED"
+        contents {
+            from ("..") {
+                include "data/**"
+            }
+            from (jar) { // NOT obfuscated
+                into "lib"
+                include "**"
+            }
+            from (configurations.runtime) {
+                into "lib"
+                include "**"
+            }
+            from (startScripts) {
+                into "bin"
+                include "**"
+            }
+        }
+    }
+}
+
+// overwite tasks that would normally produce a 'main' distribution
+// it's too hard to change 'main' distribution to include proguard
+// so just replace it instead
+
+task distTar (overwrite: true) {
+    dependsOn normalDistTar
+    dependsOn unobfuscatedDistTar
+}
+task distZip (overwrite: true) {
+    dependsOn normalDistZip
+    dependsOn unobfuscatedDistZip
+}
+task assembleDist (overwrite: true) {
+    dependsOn assembleNormalDist
+    dependsOn assembleUnobfuscatedDist
+}
+task installDist (overwrite: true) {
+    dependsOn installNormalDist
+    dependsOn installUnobfuscatedDist
+}
+
+
+
+// IDE-specific --------------------------------------------
+
+// configure 'eclipse' plugin
+eclipse {
+    project {
+        name = appName + "-client"
+    }
+}
+
