@@ -9,6 +9,7 @@
 
 // this section is for gradle itself
 buildscript {
+    ext.kotlinVersion = '1.0.4'
     repositories {
         // where to download gradle from
         mavenLocal()
@@ -18,6 +19,9 @@ buildscript {
         flatDir dirs: 'gradle/proguard'
     }
     dependencies {
+        // kotlin
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+
         // this is "group:name:version" syntax without group or version
         classpath ':proguard:'
     }
@@ -60,8 +64,15 @@ allprojects {
 
 project(":client") {
     apply plugin: "java"
+    apply plugin: "kotlin"
 
     dependencies {
+        // kotlin
+        compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+        //compile "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
+        //testCompile "org.jetbrains.kotlin:kotlin-test:$kotlinVersion"
+        //testCompile "org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion"
+
         // originally from :core
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"

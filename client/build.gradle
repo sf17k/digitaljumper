@@ -21,6 +21,7 @@ sourceCompatibility = 1.7
 
 // configure the 'main' source set
 // (not using any additional source sets)
+// see also: 'kotlin' plugin settings below
 sourceSets.main.java.srcDirs = [ "src/" ]
 
 // set source code text encoding
@@ -35,6 +36,12 @@ sourceSets.main.java.srcDirs = [ "src/" ]
 
 // minimize confusion, use this instead of "libs"
 jar.destinationDir = file("$buildDir/libs-unprocessed")
+
+
+// 'kotlin' plugin -----------------------------------------
+
+// mix kotlin and java sources
+sourceSets.main.kotlin.srcDirs = sourceSets.main.java.srcDirs
 
 
 // proguard ------------------------------------------------
