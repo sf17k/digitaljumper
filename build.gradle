@@ -7,11 +7,27 @@
 // See readme-gradle.txt for details.
 
 
+ext {
+    appName = "digital-jumper"
+
+    artemisVersion = '2.0.0'
+    artemisContribVersion = '1.2.1'
+
+    gdxVersion = '1.9.3'
+    roboVMVersion = '2.1.0'
+    box2DLightsVersion = '1.4'
+    ashleyVersion = '1.7.0'
+    aiVersion = '1.8.0'
+}
+
+
 // this section is for gradle itself
 buildscript {
-    ext.kotlinVersion = '1.0.4'
+    ext {
+        kotlinVersion = '1.0.4'
+    }
     repositories {
-        // where to download gradle from
+        // where to download gradle and plugins from
         mavenLocal()
         mavenCentral()
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
@@ -39,15 +55,6 @@ allprojects {
     // leave commented out for "unspecified"
     //version = '1.0'
 
-    ext {
-        appName = "digital-jumper"
-        gdxVersion = '1.9.3'
-        roboVMVersion = '2.1.0'
-        box2DLightsVersion = '1.4'
-        ashleyVersion = '1.7.0'
-        aiVersion = '1.8.0'
-    }
-
     // repos to download dependencies from
     // including libgdx and its extensions
     repositories {
@@ -72,6 +79,16 @@ project(":client") {
         //compile "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
         //testCompile "org.jetbrains.kotlin:kotlin-test:$kotlinVersion"
         //testCompile "org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion"
+
+        // artemis-odb
+        compile "net.onedaybeard.artemis:artemis-odb:$artemisVersion"
+        //compile "net.onedaybeard.artemis:artemis-odb-serializer-json-libgdx:$artemisVersion"
+
+        // artemis-odb-contrib
+        //compile "net.mostlyoriginal.artemis-odb:contrib-core:$artemisContribVersion"
+        //compile "net.mostlyoriginal.artemis-odb:contrib-jam:$artemisContribVersion"
+        //compile "net.mostlyoriginal.artemis-odb:contrib-eventbus:$artemisContribVersion"
+        //compile "net.mostlyoriginal.artemis-odb:contrib-plugin-operations:$artemisContribVersion"
 
         // originally from :core
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
