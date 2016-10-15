@@ -14,6 +14,10 @@ abstract class Go {
         GameWorld.gos.add(this)
     }
 
+    fun destroy() {
+        GameWorld.gos.removeValue(this, true)
+    }
+
     abstract fun getSprite(): Sprite
     abstract fun tick(delta: Float)
 
