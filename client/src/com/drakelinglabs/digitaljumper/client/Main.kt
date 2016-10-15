@@ -8,7 +8,8 @@ object Main {
     @JvmStatic fun main(args: Array<String>) {
         val config = Lwjgl3ApplicationConfiguration()
         config.setTitle("Digital Jumper")
-        config.setWindowedMode(800, 480)
+        config.setWindowedMode(GameWorld.WORLD_W, GameWorld.WORLD_H)
+        config.setResizable(false)
         Lwjgl3Application(GameApp, config)
     }
 

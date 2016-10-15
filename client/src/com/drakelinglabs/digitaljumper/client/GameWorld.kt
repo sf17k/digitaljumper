@@ -11,7 +11,8 @@ import java.util.*
 
 object GameWorld {
 
-    val WORLD_SIZE = 300f
+    val WORLD_W = 480
+    val WORLD_H = 480
     val ASTEROID_SPEED = 30f
 
     val gos = Array<Go>()
@@ -21,13 +22,15 @@ object GameWorld {
         gos.clear()
 
         val ship = Ship()
+        ship.pos.set(WORLD_W / 2f, WORLD_H / 2f)
+        ship.angle = MathUtils.PI / 2f
 
         for (i in 0..5) {
             val a = Asteroid(3)
             a.angle = MathUtils.PI2 * rng.nextFloat()
             a.pos.set(
-                    WORLD_SIZE * (rng.nextFloat() - 0.5f),
-                    WORLD_SIZE * (rng.nextFloat() - 0.5f))
+                    WORLD_W * 0.6f * (rng.nextFloat() - 0.5f),
+                    WORLD_H * (rng.nextFloat() - 0.5f))
             a.vel.set(ASTEROID_SPEED, 0f).rotateRad(MathUtils.PI2 * rng.nextFloat())
         }
 
@@ -35,8 +38,20 @@ object GameWorld {
 
     fun tick(delta: Float) {
         gos.map { it.tick(delta) }
+        gos.map { wrap(it.pos) }
         checkCollisions(delta)
         gos.removeAll { it.isRemoved() }
+    }
+
+    fun wrap(v: Vector2) {
+        if (v.x < 0)
+            v.x += WORLD_W
+        if (v.x >= WORLD_W)
+            v.x -= WORLD_W
+        if (v.y < 0)
+            v.y += WORLD_H
+        if (v.y >= WORLD_H)
+            v.y -= WORLD_H
     }
 
     fun checkCollisions(delta: Float) {

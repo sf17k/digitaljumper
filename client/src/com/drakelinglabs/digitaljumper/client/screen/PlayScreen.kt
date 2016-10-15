@@ -28,7 +28,7 @@ class PlayScreen : Screen {
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
-        camera.position.set(0f, 0f, 0f)
+        camera.position.set(GameWorld.WORLD_W / 2f, GameWorld.WORLD_H / 2f, 0f)
         camera.update()
         batch.projectionMatrix = camera.combined
         batch.begin()
