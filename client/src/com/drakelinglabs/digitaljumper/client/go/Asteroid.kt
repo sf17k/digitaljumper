@@ -14,6 +14,8 @@ class Asteroid(var size: Int) : Go() {
         return s
     }
 
+    override fun getRadius() = 20f * size / 3f
+
     override fun tick(delta: Float) {
         pos.add(vel.cpy().scl(delta))
         angle += ROT_SPEED * delta

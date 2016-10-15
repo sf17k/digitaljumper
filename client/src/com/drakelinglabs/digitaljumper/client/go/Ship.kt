@@ -16,6 +16,7 @@ class Ship() : Go() {
     var shootTimer = SHOOT_INTERVAL
 
     override fun getSprite() = Assets.ship
+    override fun getRadius() = 16f
 
     override fun tick(delta: Float) {
         // timers
