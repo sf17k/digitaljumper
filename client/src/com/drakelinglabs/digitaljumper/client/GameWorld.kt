@@ -1,5 +1,7 @@
 package com.drakelinglabs.digitaljumper.client
 
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Array
@@ -14,6 +16,8 @@ object GameWorld {
     val WORLD_W = 480
     val WORLD_H = 480
     val ASTEROID_SPEED = 30f
+
+    var dead = false
 
     val gos = Array<Go>()
     val rng = Random()
@@ -37,6 +41,10 @@ object GameWorld {
     }
 
     fun tick(delta: Float) {
+        if (dead && Gdx.input.isKeyJustPressed(Input.Keys.Z)) {
+            dead = false
+            restart()
+        }
         gos.map { it.tick(delta) }
         gos.map { wrap(it.pos) }
         checkCollisions(delta)
@@ -78,6 +86,7 @@ object GameWorld {
     fun hitShipAsteroid(s: Ship, a: Asteroid) {
         s.remove()
         breakAsteroid(a)
+        dead = true
     }
 
     fun hitBulletAsteroid(b: Bullet, a: Asteroid) {
