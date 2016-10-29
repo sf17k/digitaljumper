@@ -39,6 +39,9 @@ class MultiplyingSys : PassiveSystem() {
                     MathUtils.PI2 * game.rng.nextFloat(), GameSys.ASTEROID_INITIAL_VROT,
                     mult.size - 1)
         }
+
+        // prevent multiplying again on further damage
+        mMultiplying.remove(ev.e)
     }
 
 }
