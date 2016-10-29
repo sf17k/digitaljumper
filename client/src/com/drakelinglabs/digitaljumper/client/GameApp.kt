@@ -10,10 +10,7 @@ object GameApp : Game() {
     }
 
     fun restart() {
-        GameWorld.restart()
-
         val s = PlayScreen()
-        s.restart()
         setScreen(s)
     }
 

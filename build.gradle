@@ -82,12 +82,12 @@ project(":client") {
 
         // artemis-odb
         compile "net.onedaybeard.artemis:artemis-odb:$artemisVersion"
-        //compile "net.onedaybeard.artemis:artemis-odb-serializer-json-libgdx:$artemisVersion"
+        compile "net.onedaybeard.artemis:artemis-odb-serializer-json-libgdx:$artemisVersion"
 
         // artemis-odb-contrib
-        //compile "net.mostlyoriginal.artemis-odb:contrib-core:$artemisContribVersion"
+        compile "net.mostlyoriginal.artemis-odb:contrib-core:$artemisContribVersion"
         //compile "net.mostlyoriginal.artemis-odb:contrib-jam:$artemisContribVersion"
-        //compile "net.mostlyoriginal.artemis-odb:contrib-eventbus:$artemisContribVersion"
+        compile "net.mostlyoriginal.artemis-odb:contrib-eventbus:$artemisContribVersion"
         //compile "net.mostlyoriginal.artemis-odb:contrib-plugin-operations:$artemisContribVersion"
 
         // originally from :core
