@@ -92,7 +92,7 @@ class GameSys : BaseEntitySystem(Aspect.all(
                 Vector2(0f, 0f),
                 MathUtils.PI / 2f, 0f,
                 16f, "ship")
-        mDamage.get(ship).dealsBitmask = 0x00
+        mDamage.get(ship).dealsBitmask = 0x02
         mDamage.get(ship).takesBitmask = 0x01
         mShipControls.get(ship).accel = 500f
         mShipControls.get(ship).turnSpeed = 3.8f
