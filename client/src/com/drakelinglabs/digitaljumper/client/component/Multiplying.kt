@@ -6,4 +6,6 @@ import com.artemis.Component
 class Multiplying() : Component() {
     var size: Int = 3
     var numChildren: Int = 2
+    var speed: Float = 10f // speed of separating children
+    var spriteScale: Float = 1f // multiplied by size to get sprite scale
 }

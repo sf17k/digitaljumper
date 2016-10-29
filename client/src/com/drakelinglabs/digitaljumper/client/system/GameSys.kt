@@ -124,8 +124,11 @@ class GameSys : BaseEntitySystem(Aspect.all(
         val e = createEntity(asteroidArchetype, pos, vel, angle, vrot, size * 16f / 3f, "asteroid")
         mDamage.get(e).takesBitmask = 0x02
         mDamage.get(e).dealsBitmask = 0x01
-        mMultiplying.get(e).size = size
-        mMultiplying.get(e).numChildren = 2
+        val mult = mMultiplying.get(e)
+        mult.size = size
+        mult.numChildren = 2
+        mult.speed = ASTEROID_INITIAL_SPEED
+        mult.spriteScale = 1 / 3f
         mSpriteRender.get(e).scale = size / 3f
         return e
     }

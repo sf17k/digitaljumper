@@ -1,11 +1,15 @@
 package com.drakelinglabs.digitaljumper.client.system
 
+import com.artemis.Component
 import com.artemis.ComponentMapper
+import com.artemis.utils.Bag
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
+import com.drakelinglabs.digitaljumper.client.Utils
+import com.drakelinglabs.digitaljumper.client.component.Angle
 import com.drakelinglabs.digitaljumper.client.component.Multiplying
-import com.drakelinglabs.digitaljumper.client.component.Position
 import com.drakelinglabs.digitaljumper.client.component.SimplePhysics
+import com.drakelinglabs.digitaljumper.client.component.SpriteRender
 import com.drakelinglabs.digitaljumper.client.event.DamageEvent
 import net.mostlyoriginal.api.event.common.EventSystem
 import net.mostlyoriginal.api.event.common.Subscribe
@@ -16,8 +20,9 @@ class MultiplyingSys : PassiveSystem() {
     lateinit var bus: EventSystem
     lateinit var game: GameSys
     lateinit var mMultiplying: ComponentMapper<Multiplying>
-    lateinit var mPosition: ComponentMapper<Position>
     lateinit var mSimplePhysics: ComponentMapper<SimplePhysics>
+    lateinit var mAngle: ComponentMapper<Angle>
+    lateinit var mSpriteRender: ComponentMapper<SpriteRender>
 
     @Subscribe
     fun onDamage(ev: DamageEvent) {
@@ -26,18 +31,39 @@ class MultiplyingSys : PassiveSystem() {
             return
         if (mult.size <= 1)
             return
-        val pos = mPosition.get(ev.e)
         val phys = mSimplePhysics.get(ev.e)
-        if (pos == null)
-            return
+
         val v = if (phys != null) phys.v else Vector2()
-        val throwAngle = MathUtils.PI2 * game.rng.nextFloat()
+        val splitAngle = MathUtils.PI2 * game.rng.nextFloat()
+
+        // get components to copy to children
+        val coms = Bag<Component>()
+        world.componentManager.getComponentsFor(ev.e, coms)
+
         for (i in 0..mult.numChildren - 1) {
-            game.createAsteroid(
-                    pos.p,
-                    v.cpy().add(Vector2(GameSys.ASTEROID_INITIAL_SPEED, 0f).rotateRad(throwAngle + MathUtils.PI2 * i / mult.numChildren)),
-                    MathUtils.PI2 * game.rng.nextFloat(), GameSys.ASTEROID_INITIAL_VROT,
-                    mult.size - 1)
+            // create entity
+            val c = world.create()
+            val ce = world.edit(c)
+
+            // copy components to it
+            coms.asIterable().forEach { ce.add(Utils.copyComponent(it)) }
+
+            // adjust a few things
+            val cphys = mSimplePhysics.get(c)
+            if (cphys != null) {
+                cphys.v.set(v)
+                cphys.v.add(Vector2(mult.speed, 0f).rotateRad(splitAngle + MathUtils.PI2 * i / mult.numChildren))
+            }
+
+            val cangle = mAngle.get(c)
+            if (cangle != null) {
+                cangle.a = MathUtils.PI2 * game.rng.nextFloat()
+            }
+
+            val cmult = mMultiplying.get(c)
+            cmult.size -= 1
+
+            mSpriteRender.get(c).scale = cmult.size * cmult.spriteScale
         }
 
         // prevent multiplying again on further damage
