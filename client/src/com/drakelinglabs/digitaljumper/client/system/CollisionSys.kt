@@ -6,6 +6,7 @@ import com.artemis.ComponentMapper
 import com.artemis.utils.IntBag
 import com.drakelinglabs.digitaljumper.client.component.Collision
 import com.drakelinglabs.digitaljumper.client.component.Position
+import com.drakelinglabs.digitaljumper.client.component.Scale
 import com.drakelinglabs.digitaljumper.client.event.CollisionEvent
 import net.mostlyoriginal.api.event.common.EventSystem
 
@@ -17,6 +18,9 @@ class CollisionSys : BaseEntitySystem(Aspect.all(
     lateinit var bus: EventSystem
     lateinit var mPosition: ComponentMapper<Position>
     lateinit var mCollision: ComponentMapper<Collision>
+    lateinit var mScale: ComponentMapper<Scale>
+
+    val defScale = Scale()
 
     override fun processSystem() {
         val actives: IntBag = subscription.entities
@@ -27,7 +31,7 @@ class CollisionSys : BaseEntitySystem(Aspect.all(
                 val b = ids[j]
                 val p1 = mPosition.get(a).p
                 val p2 = mPosition.get(b).p
-                val rad = mCollision.get(a).radius + mCollision.get(b).radius
+                val rad = mCollision.get(a).radius * mScale.getSafe(a, defScale).s + mCollision.get(b).radius * mScale.getSafe(b, defScale).s
                 if (p1.dst2(p2) <= rad * rad) {
                     // collision
                     bus.dispatch(CollisionEvent(a, b))

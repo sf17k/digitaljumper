@@ -36,6 +36,7 @@ class GameSys : BaseEntitySystem(Aspect.all(
     lateinit var bus: EventSystem
     lateinit var mPosition: ComponentMapper<Position>
     lateinit var mAngle: ComponentMapper<Angle>
+    lateinit var mScale: ComponentMapper<Scale>
     lateinit var mSimplePhysics: ComponentMapper<SimplePhysics>
     lateinit var mCollision: ComponentMapper<Collision>
     lateinit var mShipControls: ComponentMapper<ShipControls>
@@ -63,6 +64,7 @@ class GameSys : BaseEntitySystem(Aspect.all(
                 .build(world)
 
         asteroidArchetype = ArchetypeBuilder(basicObjectArchetype)
+                .add(Scale::class.java)
                 .add(Multiplying::class.java)
                 .build(world)
 
@@ -121,15 +123,14 @@ class GameSys : BaseEntitySystem(Aspect.all(
     }
 
     fun createAsteroid(pos: Vector2, vel: Vector2, angle: Float, vrot: Float, size: Int): Int {
-        val e = createEntity(asteroidArchetype, pos, vel, angle, vrot, size * 16f / 3f, "asteroid")
+        val e = createEntity(asteroidArchetype, pos, vel, angle, vrot, 16f, "asteroid")
         mDamage.get(e).takesBitmask = 0x02
         mDamage.get(e).dealsBitmask = 0x01
+        mScale.get(e).s = size / 3f
         val mult = mMultiplying.get(e)
         mult.size = size
         mult.numChildren = 2
         mult.speed = ASTEROID_INITIAL_SPEED
-        mult.spriteScale = 1 / 3f
-        mSpriteRender.get(e).scale = size / 3f
         return e
     }
 

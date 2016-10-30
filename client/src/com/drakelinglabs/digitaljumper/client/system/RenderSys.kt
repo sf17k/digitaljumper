@@ -14,6 +14,7 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.viewport.ScreenViewport
 import com.drakelinglabs.digitaljumper.client.component.Angle
 import com.drakelinglabs.digitaljumper.client.component.Position
+import com.drakelinglabs.digitaljumper.client.component.Scale
 import com.drakelinglabs.digitaljumper.client.component.SpriteRender
 
 class RenderSys : BaseEntitySystem(Aspect.all(
@@ -25,6 +26,9 @@ class RenderSys : BaseEntitySystem(Aspect.all(
     lateinit var mSpriteRender: ComponentMapper<SpriteRender>
     lateinit var mPosition: ComponentMapper<Position>
     lateinit var mAngle: ComponentMapper<Angle>
+    lateinit var mScale: ComponentMapper<Scale>
+
+    val defScale = Scale()
 
     override fun processSystem() {
         preRender()
@@ -64,7 +68,7 @@ class RenderSys : BaseEntitySystem(Aspect.all(
         val spriteAngle: Float = if (angle != null) angle.a else 0f
 
         if (sprite != null) {
-            sprite.setScale(info.scale)
+            sprite.setScale(info.scale * mScale.getSafe(e, defScale).s)
             drawSpriteCentered(sprite, pos.p, spriteAngle)
         }
     }

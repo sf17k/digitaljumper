@@ -6,10 +6,7 @@ import com.artemis.utils.Bag
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
 import com.drakelinglabs.digitaljumper.client.Utils
-import com.drakelinglabs.digitaljumper.client.component.Angle
-import com.drakelinglabs.digitaljumper.client.component.Multiplying
-import com.drakelinglabs.digitaljumper.client.component.SimplePhysics
-import com.drakelinglabs.digitaljumper.client.component.SpriteRender
+import com.drakelinglabs.digitaljumper.client.component.*
 import com.drakelinglabs.digitaljumper.client.event.DamageEvent
 import net.mostlyoriginal.api.event.common.EventSystem
 import net.mostlyoriginal.api.event.common.Subscribe
@@ -22,7 +19,7 @@ class MultiplyingSys : PassiveSystem() {
     lateinit var mMultiplying: ComponentMapper<Multiplying>
     lateinit var mSimplePhysics: ComponentMapper<SimplePhysics>
     lateinit var mAngle: ComponentMapper<Angle>
-    lateinit var mSpriteRender: ComponentMapper<SpriteRender>
+    lateinit var mScale: ComponentMapper<Scale>
 
     @Subscribe
     fun onDamage(ev: DamageEvent) {
@@ -63,7 +60,7 @@ class MultiplyingSys : PassiveSystem() {
             val cmult = mMultiplying.get(c)
             cmult.size -= 1
 
-            mSpriteRender.get(c).scale = cmult.size * cmult.spriteScale
+            mScale.create(c).s *= cmult.size.toFloat() / (cmult.size + 1f)
         }
 
         // prevent multiplying again on further damage
